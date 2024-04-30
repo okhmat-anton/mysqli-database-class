@@ -1,6 +1,6 @@
 <?php
 require_once('MysqliDb.php');
-error_reporting(E_ALL);
+error_reporting(0);
 $action = 'adddb';
 $data = array();
 
