@@ -550,15 +550,29 @@ class MysqliDb
      * @param string $query      User-provided query to execute.
      * @return string Contains the returned rows from the query.
      */
-    public function rawAddPrefix($query){
+//    public function rawAddPrefix($query){
+//        $query = str_replace(PHP_EOL, '', $query);
+//        $query = preg_replace('/\s+/', ' ', $query);
+//        preg_match_all("/(from|into|update|join|describe) [\\'\\´]?([a-zA-Z0-9_-]+)[\\'\\´]?/i", $query, $matches);
+//        list($from_table, $from, $table) = $matches;
+//
+//        // todo: FIX IT!!!
+//        return @str_replace($table[0], self::$prefix.$table[0], $query);
+//    }
+    // fixed by GPT
+    public function rawAddPrefix($query) {
         $query = str_replace(PHP_EOL, '', $query);
         $query = preg_replace('/\s+/', ' ', $query);
-        preg_match_all("/(from|into|update|join|describe) [\\'\\´]?([a-zA-Z0-9_-]+)[\\'\\´]?/i", $query, $matches);
-        list($from_table, $from, $table) = $matches;
 
-        // todo: FIX IT!!!
-        return @str_replace($table[0], self::$prefix.$table[0], $query);
+        return preg_replace_callback(
+            "/\b(from|into|update|join|describe)\s+[`'\"]?([a-zA-Z0-9_-]+)[`'\"]?/i",
+            function ($matches) {
+                return $matches[1] . ' ' . self::$prefix . $matches[2];
+            },
+            $query
+        );
     }
+
 
     /**
      * Execute raw SQL query.
